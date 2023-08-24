@@ -8,6 +8,7 @@ import shutil
 import urllib.parse
 from time import sleep, time
 from typing import Any, Dict, Optional
+from pathlib import Path
 
 from streaming.base.util import get_import_exception_message
 
@@ -376,11 +377,14 @@ def download_from_local(remote: str, local: str) -> None:
         remote (str): Remote path (local filesystem).
         local (str): Local path (local filesystem).
     """
-    local_tmp = local + '.tmp'
-    if os.path.exists(local_tmp):
-        os.remove(local_tmp)
-    shutil.copy(remote, local_tmp)
-    os.rename(local_tmp, local)
+    # local_tmp = local + '.tmp'
+    # if os.path.exists(local_tmp):
+    #     os.remove(local_tmp)
+    # shutil.copy(remote, local_tmp)
+    # os.rename(local_tmp, local)
+    local = Path(local)
+    local.symlink_to(remote)
+    assert (local).exists()
 
 
 def download_file(remote: Optional[str], local: str, timeout: float):
