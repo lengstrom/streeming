@@ -382,10 +382,14 @@ def download_from_local(remote: str, local: str) -> None:
     #     os.remove(local_tmp)
     # shutil.copy(remote, local_tmp)
     # os.rename(local_tmp, local)
+    remote = Path(remote)
     local = Path(local)
-    local.symlink_to(remote)
-    assert (local).exists()
+    assert remote.exists(), f'Remote {remote} does not exist!'
 
+    if local.exists() or local.is_symlink():
+        assert local.resolve() == remote.resolve(), (local.resolve(), remote.resolve(), remote, local)
+    else:
+        local.hardlink_to(remote)
 
 def download_file(remote: Optional[str], local: str, timeout: float):
     """Use the correct download handler to download the file.
