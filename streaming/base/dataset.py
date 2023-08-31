@@ -12,6 +12,7 @@ from enum import IntEnum
 from math import ceil
 from threading import Event, Lock
 from time import sleep, time_ns
+from datetime import datetime
 from typing import Any, Dict, Iterator, Optional, Sequence, Tuple, Union
 
 import numpy as np
@@ -413,7 +414,12 @@ class StreamingDataset(Array, IterableDataset):
         # Register/lookup our shared memory prefix and filelock root directory.
         my_locals = [os.path.abspath(os.path.join(x.local, x.split)) for x in streams]
         self._shm_prefix_int, self._locals_shm = get_shm_prefix(my_locals, world)
-        self._filelock_root = os.path.join(os.path.sep, 'tmp', 'streaming')
+
+        current_datetime = datetime.now()
+        formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
+        current_user = os.environ.get('USER')
+
+        self._filelock_root = os.path.join(os.path.sep, 'tmp', current_user, formatted_datetime, 'streaming')
         os.makedirs(self._filelock_root, exist_ok=True)
 
         # Create the shared memory-backed barrier, without its lock, which is unpickleable.
