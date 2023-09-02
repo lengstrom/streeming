@@ -6,7 +6,7 @@
 The prefix is used by all workers using this StreamingDataset of this training job. This is used to
 prevent shared resources like shared memory from colliding.
 """
-
+import os
 from time import sleep
 from typing import Iterator, List, Set, Tuple
 
@@ -40,7 +40,11 @@ def _get_path(prefix_int: int, name: str) -> str:
     Returns:
         str: Unique shared memory name.
     """
-    return f'{prefix_int:06}_{name}'
+    _USER = os.environ.get('USER', '')
+    _RUN_ID = os.environ.get('RUN_ID', '')
+    name = f'{prefix_int:06}_{name}'
+    path = os.path.join(_USER, _RUN_ID, name).replace(os.sep, '_')
+    return path
 
 
 def _pack_locals(dirnames: Set[str]) -> bytes:

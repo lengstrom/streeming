@@ -415,11 +415,9 @@ class StreamingDataset(Array, IterableDataset):
         my_locals = [os.path.abspath(os.path.join(x.local, x.split)) for x in streams]
         self._shm_prefix_int, self._locals_shm = get_shm_prefix(my_locals, world)
 
-        current_datetime = datetime.now()
-        formatted_datetime = current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
-        current_user = os.environ.get('USER')
-
-        self._filelock_root = os.path.join(os.path.sep, 'tmp', current_user, formatted_datetime, 'streaming')
+        _USER = os.environ.get('USER', '')
+        _RUN_ID = os.environ.get('RUN_ID', '')
+        self._filelock_root = os.path.join(os.path.sep, 'tmp', _USER, _RUN_ID, 'streaming')
         os.makedirs(self._filelock_root, exist_ok=True)
 
         # Create the shared memory-backed barrier, without its lock, which is unpickleable.
